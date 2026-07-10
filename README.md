@@ -1,24 +1,54 @@
 # PMX - Lokaler Passwortmanager
 
-Ein lokaler Offline-Passwortmanager, entwickelt mit **Java**, **JavaFX**, **SQLite** und **NitriteDB**.
+**PMX** ist ein lokaler Offline-Passwortmanager als JavaFX-Desktopanwendung.  
+Das Projekt zeigt eine vollständige Benutzeroberfläche mit Login, Tresoransicht, Eintragsverwaltung, Passwortgenerator und lokaler Verschlüsselung.
 
 > **Hinweis:** Dieses Repository ist ein Demo- und Bewerbungsprojekt. Es enthält keine produktiven Benutzerdaten, keine echten Zugangsdaten und keine sensiblen lokalen Datenbanken.
 
-## Überblick
+## Projektfokus
 
-PMX wurde im Rahmen meiner Umschulung zum **Fachinformatiker für Anwendungsentwicklung** entwickelt.
+- Lokale Desktop-Anwendung ohne Cloud-Synchronisierung
+- Moderne JavaFX-Oberfläche mit dunklem PMX-Design
+- Verschlüsselte Speicherung sensibler Zugangsdaten
+- Benutzerregistrierung, Login und Recovery-Funktion
+- Übersichtliche Tresoransicht mit Suche, Bearbeiten- und Löschfunktion
+- Sicherheitsbewusster Aufbau mit Master Passwort, Schlüsselableitung und AES-GCM-Verschlüsselung
 
-Ziel war die Umsetzung eines lokalen Passwortmanagers mit Fokus auf **Sicherheit**, **Offline-Betrieb** und **klarer Benutzerführung**. Die Anwendung speichert Zugangsdaten lokal, verschlüsselt sensible Daten und verzichtet bewusst auf Cloud-Synchronisierung.
+## Screenshots
+
+### Login
+
+<p>
+  <img src="docs/screenshots/login.png" alt="PMX Login" width="420">
+</p>
+
+### Tresor
+
+<p>
+  <img src="docs/screenshots/vault.png" alt="PMX Tresoransicht" width="760">
+</p>
+
+### Einträge verwalten
+
+<p>
+  <img src="docs/screenshots/add-entry.png" alt="Neuen Eintrag hinzufügen" width="420">
+  <img src="docs/screenshots/edit-entry.png" alt="Eintrag bearbeiten" width="420">
+</p>
+
+### Löschen Dialog
+
+<p>
+  <img src="docs/screenshots/delete-dialog.png" alt="Eintrag löschen" width="460">
+</p>
 
 ## Funktionen
 
-- Benutzerregistrierung und Login
-- Lokale, verschlüsselte Speicherung von Zugangsdaten
-- Passwortgenerator
-- Recovery-Funktion
-- Übersichtliche Tresoransicht für gespeicherte Einträge
-- Suche nach Website oder Benutzername
-- Einträge hinzufügen, bearbeiten und löschen
+- Benutzer anlegen und anmelden
+- Zugangsdaten lokal speichern
+- Einträge suchen, hinzufügen, bearbeiten und löschen
+- Passwortgenerator für neue Zugangsdaten
+- Recovery-Funktion für das Zurücksetzen des Master Passworts
+- Getrennte Speicherung von Benutzer- und Tresordaten
 
 ## Technologien
 
@@ -34,73 +64,46 @@ Ziel war die Umsetzung eines lokalen Passwortmanagers mit Fokus auf **Sicherheit
 - **AES-256-GCM** zur Verschlüsselung sensibler Daten
 - **PBKDF2-HMAC-SHA-256** zur Schlüsselableitung
 - Trennung von Benutzerverwaltung und Tresordaten
-- Keine Speicherung produktiver Daten im Repository
+- Keine produktiven Daten im Repository
 - Lokaler Betrieb ohne externe Synchronisierung
 
 ## Projekt lokal starten
 
 ### Voraussetzungen
 
-- Java 17
+- Java 17 oder neuer
 - Maven
 - IntelliJ IDEA oder eine andere Java-IDE
 
 ### Start
 
-1. Repository klonen:
-
-   ```bash
-   git clone https://github.com/n-somas/pmx-password-manager.git
-   ```
-
-2. In den Projektordner wechseln:
-
-   ```bash
-   cd pmx-password-manager
-   ```
-
-3. Maven-Abhängigkeiten laden:
-
-   ```bash
-   mvn clean install
-   ```
-
-4. Anwendung starten:
-
-   ```bash
-   mvn javafx:run
-   ```
-
-### Tests ausführen
+Repository klonen:
 
 ```bash
-mvn test
+git clone https://github.com/n-somas/pmx-password-manager.git
 ```
 
-## Screenshots
+In den Projektordner wechseln:
 
-### Login und Tresor
+```bash
+cd pmx-password-manager
+```
 
-<p>
-  <img src="docs/screenshots/login.png" alt="Login" width="360">
-</p>
+Abhängigkeiten laden und Tests ausführen:
 
-<p>
-  <img src="docs/screenshots/vault.png" alt="Tresor" width="700">
-</p>
+```bash
+mvn clean test
+```
 
-### Einträge verwalten
+Anwendung starten:
 
-<p>
-  <img src="docs/screenshots/add-entry.png" alt="Eintrag hinzufügen" width="360">
-  <img src="docs/screenshots/edit-entry.png" alt="Eintrag bearbeiten" width="360">
-</p>
+```bash
+mvn javafx:run
+```
 
-### Löschen-Dialog
+## Projektstatus
 
-<p>
-  <img src="docs/screenshots/delete-dialog.png" alt="Löschen-Dialog" width="420">
-</p>
+PMX ist ein Bewerbungs- und Lernprojekt mit Fokus auf Java, JavaFX, lokaler Datenhaltung, Verschlüsselung und sauberer Benutzerführung.
 
 ## Autor
 

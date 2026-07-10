@@ -13,7 +13,7 @@
 
     <top>
         <HBox alignment="CENTER_LEFT"
-              spacing="10"
+              spacing="6"
               styleClass="title-bar"
               onMousePressed="#onWindowMousePressed"
               onMouseDragged="#onWindowMouseDragged">
@@ -33,7 +33,7 @@
             <VBox styleClass="dialog-card" spacing="15" alignment="CENTER">
                 <VBox spacing="4" alignment="CENTER">
                     <Label text="Passwort wiederherstellen" styleClass="dialog-title"/>
-                    <Label text="Master-Passwort mit Recovery-Key neu setzen." styleClass="dialog-subtitle"/>
+                    <Label text="Master Passwort mit Recovery Key neu setzen." styleClass="dialog-subtitle"/>
                 </VBox>
 
                 <VBox spacing="4" alignment="CENTER_LEFT">
@@ -42,25 +42,25 @@
                 </VBox>
 
                 <VBox spacing="4" alignment="CENTER_LEFT">
-                    <Label text="Recovery-Key" styleClass="field-label"/>
+                    <Label text="Recovery Key" styleClass="field-label"/>
                     <TextField fx:id="recoveryKeyField" promptText="1111-2222-3333-4444-5555" styleClass="text-input"/>
                 </VBox>
 
                 <VBox spacing="4" alignment="CENTER_LEFT">
-                    <Label text="Neues Master-Passwort" styleClass="field-label"/>
+                    <Label text="Neues Master Passwort" styleClass="field-label"/>
                     <PasswordField fx:id="newPasswordField" promptText="Neues Passwort eingeben" styleClass="text-input"/>
                 </VBox>
 
                 <VBox spacing="4" alignment="CENTER_LEFT">
-                    <Label text="Passwort bestaetigen" styleClass="field-label"/>
+                    <Label text="Passwort bestätigen" styleClass="field-label"/>
                     <PasswordField fx:id="confirmPasswordField" promptText="Passwort erneut eingeben" styleClass="text-input"/>
                 </VBox>
 
                 <Label fx:id="messageLabel" styleClass="error-label" wrapText="true" maxWidth="Infinity"/>
 
                 <HBox spacing="10" alignment="CENTER">
-                    <Button text="Zuruecksetzen" onAction="#onRecover" styleClass="primary-button"/>
-                    <Button text="Schliessen" onAction="#onClose" styleClass="secondary-button"/>
+                    <Button text="Zurücksetzen" onAction="#onRecover" styleClass="primary-button"/>
+                    <Button text="Schließen" onAction="#onClose" styleClass="secondary-button"/>
                 </HBox>
             </VBox>
         </VBox>

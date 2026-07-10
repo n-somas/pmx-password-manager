@@ -26,7 +26,7 @@
         <HBox alignment="CENTER_LEFT" spacing="14">
             <VBox spacing="5" HBox.hgrow="ALWAYS">
                 <Label text="Tresor" styleClass="page-title"/>
-                <Label text="Lokale Zugangsdaten verwalten und verschluesselt speichern." styleClass="page-subtitle"/>
+                <Label text="Lokale Zugangsdaten verwalten und verschlüsselt speichern." styleClass="page-subtitle"/>
             </VBox>
 
             <Button text="+ Neuer Eintrag" onAction="#onAddEntry" styleClass="ghost-button"/>

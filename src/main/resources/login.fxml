@@ -13,7 +13,7 @@
 
     <top>
         <HBox alignment="CENTER_LEFT"
-              spacing="10"
+              spacing="6"
               styleClass="title-bar"
               onMousePressed="#onWindowMousePressed"
               onMouseDragged="#onWindowMouseDragged">
@@ -44,9 +44,9 @@
                 </VBox>
 
                 <VBox spacing="5" alignment="CENTER_LEFT">
-                    <Label text="Master-Passwort" styleClass="field-label"/>
+                    <Label text="Master Passwort" styleClass="field-label"/>
                     <PasswordField fx:id="passwordField"
-                                   promptText="Master-Passwort eingeben"
+                                   promptText="Master Passwort eingeben"
                                    styleClass="text-input"/>
                 </VBox>
 

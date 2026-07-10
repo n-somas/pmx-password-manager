@@ -13,7 +13,7 @@
 
     <top>
         <HBox alignment="CENTER_LEFT"
-              spacing="10"
+              spacing="6"
               styleClass="title-bar"
               onMousePressed="#onWindowMousePressed"
               onMouseDragged="#onWindowMouseDragged">
@@ -33,7 +33,7 @@
             <VBox styleClass="dialog-card" spacing="15" alignment="CENTER">
                 <VBox spacing="4" alignment="CENTER">
                     <Label text="Benutzer anlegen" styleClass="dialog-title"/>
-                    <Label text="Lokales Konto fuer den Passwort-Tresor erstellen." styleClass="dialog-subtitle"/>
+                    <Label text="Lokales Konto fuer den Passwort Tresor erstellen." styleClass="dialog-subtitle"/>
                 </VBox>
 
                 <VBox spacing="4" alignment="CENTER_LEFT">
@@ -42,29 +42,29 @@
                 </VBox>
 
                 <VBox spacing="4" alignment="CENTER_LEFT">
-                    <Label text="Master-Passwort" styleClass="field-label"/>
-                    <PasswordField fx:id="passwordField" promptText="Master-Passwort eingeben" styleClass="text-input"/>
+                    <Label text="Master Passwort" styleClass="field-label"/>
+                    <PasswordField fx:id="passwordField" promptText="Master Passwort eingeben" styleClass="text-input"/>
                 </VBox>
 
                 <VBox spacing="4" alignment="CENTER_LEFT">
-                    <Label text="Passwort bestaetigen" styleClass="field-label"/>
+                    <Label text="Passwort bestätigen" styleClass="field-label"/>
                     <PasswordField fx:id="confirmPasswordField" promptText="Passwort erneut eingeben" styleClass="text-input"/>
                 </VBox>
 
                 <VBox spacing="4" alignment="CENTER_LEFT">
-                    <Label text="Recovery-Key" styleClass="field-label"/>
+                    <Label text="Recovery Key" styleClass="field-label"/>
                     <TextField fx:id="recoveryKeyField"
                                promptText="Wird nach der Erstellung angezeigt"
                                editable="false"
                                styleClass="text-input"/>
-                    <Label text="Recovery-Key sicher notieren. Ohne ihn ist keine Wiederherstellung moeglich." styleClass="hint-label" wrapText="true"/>
+                    <Label text="Recovery Key sicher notieren. Ohne ihn ist keine Wiederherstellung möglich." styleClass="hint-label" wrapText="true"/>
                 </VBox>
 
                 <Label fx:id="messageLabel" styleClass="error-label" wrapText="true" maxWidth="Infinity"/>
 
                 <HBox spacing="10" alignment="CENTER">
                     <Button text="Benutzer erstellen" onAction="#onRegister" styleClass="primary-button"/>
-                    <Button text="Schliessen" onAction="#onClose" styleClass="secondary-button"/>
+                    <Button text="Schließen" onAction="#onClose" styleClass="secondary-button"/>
                 </HBox>
             </VBox>
         </VBox>

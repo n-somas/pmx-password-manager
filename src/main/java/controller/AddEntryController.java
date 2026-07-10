@@ -6,7 +6,8 @@ import app.AppState;
 
 // JavaFX: FXML & UI
 import javafx.fxml.FXML;                   // @FXML-Bindings aus der FXML
-import javafx.scene.control.Label;         // Textausgabe
+import javafx.scene.control.Label;
+import javafx.scene.control.Button;         // Textausgabe
 import javafx.scene.control.PasswordField; // Passworteingabe
 import javafx.scene.control.TextField;     // Texteingabe
 import javafx.scene.paint.Color;           // Label-Farben
@@ -28,7 +29,9 @@ public class AddEntryController {
     @FXML private PasswordField passwordField;  // Passwort
     @FXML private Label messageLabel;           // Status-/Fehlermeldungen
     @FXML private Label strengthLabel;          // Anzeige der Passwortstärke
-
+    @FXML private Label dialogTitleLabel;       // Dialogtitel
+    @FXML private Label dialogSubtitleLabel;    // Dialoguntertitel
+    @FXML private Button saveButton;            // Speichern/Aktualisieren-Button
     private VaultController vaultController;    // Referenz zum VaultController
 
     // Bearbeitungsmodus
@@ -49,6 +52,7 @@ public class AddEntryController {
                     -> updateStrength(newVal));
             updateStrength(passwordField.getText());
         }
+        hideMessage();
     }
 
     // Eintrag in Bearbeitungsmodus laden
@@ -61,8 +65,17 @@ public class AddEntryController {
         usernameField.setText(entry.getUsername());
         passwordField.clear(); // Sicherheit: Passwort nie vorausfüllen
 
-        messageLabel.setText("Bearbeitungsmodus");
-        messageLabel.setTextFill(Color.DARKBLUE);
+        if (dialogTitleLabel != null) {
+            dialogTitleLabel.setText("Eintrag bearbeiten");
+        }
+        if (dialogSubtitleLabel != null) {
+            dialogSubtitleLabel.setText("Bestehende Zugangsdaten bearbeiten.");
+        }
+        if (saveButton != null) {
+            saveButton.setText("Aktualisieren");
+        }
+
+        hideMessage();
         updateStrength(passwordField.getText());
     }
 
@@ -163,16 +176,31 @@ public class AddEntryController {
         strengthLabel.setTextFill(color);
     }
 
+    private void hideMessage() {
+        if (messageLabel != null) {
+            messageLabel.setText("");
+            messageLabel.setVisible(false);
+            messageLabel.setManaged(false);
+        }
+    }
+
+    private void showMessage(String msg, Color color) {
+        if (messageLabel != null) {
+            messageLabel.setText(msg);
+            messageLabel.setTextFill(color);
+            messageLabel.setVisible(true);
+            messageLabel.setManaged(true);
+        }
+    }
+
     // Erfolgsmeldung
     private void ok(String msg) {
-        messageLabel.setText(msg);
-        messageLabel.setTextFill(Color.GREEN);
+        showMessage(msg, Color.GREEN);
     }
 
     // Fehlermeldung
     private void fail(String msg) {
-        messageLabel.setText(msg);
-        messageLabel.setTextFill(Color.RED);
+        showMessage(msg, Color.RED);
     }
 
     // Trim null-sicher

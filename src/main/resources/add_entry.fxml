@@ -13,7 +13,7 @@
 
     <top>
         <HBox alignment="CENTER_LEFT"
-              spacing="10"
+              spacing="6"
               styleClass="title-bar"
               onMousePressed="#onWindowMousePressed"
               onMouseDragged="#onWindowMouseDragged">
@@ -32,8 +32,8 @@
 
             <VBox styleClass="dialog-card" spacing="17" alignment="CENTER">
                 <VBox spacing="4" alignment="CENTER">
-                    <Label text="Eintrag speichern" styleClass="dialog-title"/>
-                    <Label text="Zugangsdaten lokal verschluesselt ablegen." styleClass="dialog-subtitle"/>
+                    <Label fx:id="dialogTitleLabel" text="Neuer Eintrag" styleClass="dialog-title"/>
+                    <Label fx:id="dialogSubtitleLabel" text="Neue Zugangsdaten lokal verschlüsselt speichern." styleClass="dialog-subtitle"/>
                 </VBox>
 
                 <VBox spacing="4" alignment="CENTER_LEFT">
@@ -63,10 +63,10 @@
                     </HBox>
                 </VBox>
 
-                <Label fx:id="strengthLabel" text="Passwortstaerke: -" styleClass="hint-label"/>
+                <Label fx:id="strengthLabel" text="Passwortstärke: -" styleClass="hint-label"/>
                 <Label fx:id="messageLabel" styleClass="error-label" wrapText="true" maxWidth="Infinity"/>
 
-                <Button text="Speichern"
+                <Button fx:id="saveButton" text="Speichern"
                         onAction="#onSave"
                         prefWidth="340"
                         maxWidth="340"
