@@ -15,7 +15,11 @@ import javafx.scene.control.Label;       // Meldungen
 import javafx.scene.control.PasswordField; // Passwort-Eingaben
 import javafx.scene.control.TextField;   // Text-/Recovery-Key-Anzeige
 
+import java.security.SecureRandom;
+
 public class RegisterController {
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     // FXML-Felder
     @FXML private TextField usernameField;
@@ -58,14 +62,7 @@ public class RegisterController {
 
         try {
             // 1) Recovery-Key (kurzes, gut ablesbares Format)
-            String recoveryKey = String.format(
-                    "%04d-%04d-%04d-%04d-%04d",
-                    (int)(Math.random()*10000),
-                    (int)(Math.random()*10000),
-                    (int)(Math.random()*10000),
-                    (int)(Math.random()*10000),
-                    (int)(Math.random()*10000)
-            );
+            String recoveryKey = generateRecoveryKey();
             recoveryKeyField.setText(recoveryKey);
             recoveryKeyField.selectAll();
 
@@ -120,4 +117,12 @@ public class RegisterController {
     private String safeTrim(String s) {
         return s == null ? "" : s.trim();
     }
-}
+
+    private String generateRecoveryKey() {
+        return String.format("%04d-%04d-%04d-%04d-%04d",
+                SECURE_RANDOM.nextInt(10_000),
+                SECURE_RANDOM.nextInt(10_000),
+                SECURE_RANDOM.nextInt(10_000),
+                SECURE_RANDOM.nextInt(10_000),
+                SECURE_RANDOM.nextInt(10_000));
+    }}

@@ -31,11 +31,11 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
             Parent root = loader.load();
 
-            Scene scene = new Scene(root, 420, 420);
-            primaryStage.setTitle("Tozen Passwort-Manager – Login");
+            Scene scene = new Scene(root, 480, 560);
+            primaryStage.setTitle("PasswortManagerX – Login");
             primaryStage.setScene(scene);
-            primaryStage.setMinWidth(380);
-            primaryStage.setMinHeight(360);
+            primaryStage.setMinWidth(440);
+            primaryStage.setMinHeight(520);
 
             // Bei Fenster-Schließen sensitives Material löschen
             primaryStage.setOnCloseRequest(evt -> safeShutdown());

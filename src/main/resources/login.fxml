@@ -1,44 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Import der benötigten JavaFX-Layout- und Steuerelement-Klassen -->
-<?import javafx.scene.layout.VBox?> <!-- Vertikale Anordnung der Elemente -->
-<?import javafx.scene.control.*?>   <!-- Label, TextField, PasswordField, Button -->
-<?import javafx.geometry.Insets?>   <!-- Innenabstände (Padding) -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<!--
-    Layout: VBox
-    - Enthält die komplette Login-Maske
-    - Controller: controller.LoginController
-    - spacing: Abstand zwischen Elementen
-    - alignment: zentrierte Anordnung
--->
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controller.LoginController"
-      spacing="10" alignment="CENTER">
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.LoginController"
+      spacing="18" alignment="CENTER" styleClass="screen" stylesheets="@styles.css">
 
-    <!-- Innenabstand für den gesamten Inhalt -->
     <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
+        <Insets top="32" right="32" bottom="32" left="32"/>
     </padding>
 
-    <!-- Überschrift des Login-Fensters -->
-    <Label text="Tozen Passwort-Manager" style="-fx-font-size: 16;" />
+    <VBox spacing="8" alignment="CENTER">
+        <Label text="PasswortManagerX" styleClass="title"/>
+        <Label text="Lokaler Offline-Passwortmanager" styleClass="subtitle"/>
+    </VBox>
 
-    <!-- Eingabefeld für Benutzernamen -->
-    <TextField fx:id="usernameField" promptText="Benutzername" />
+    <VBox spacing="14" alignment="CENTER" styleClass="card">
+        <VBox spacing="4" alignment="CENTER_LEFT">
+            <Label text="Benutzername" styleClass="field-label"/>
+            <TextField fx:id="usernameField"
+                       promptText="Benutzername eingeben"
+                       styleClass="text-input"/>
+        </VBox>
 
-    <!-- Eingabefeld für Passwort (verdeckt) -->
-    <PasswordField fx:id="passwordField" promptText="Passwort" />
+        <VBox spacing="4" alignment="CENTER_LEFT">
+            <Label text="Master-Passwort" styleClass="field-label"/>
+            <PasswordField fx:id="passwordField"
+                           promptText="Master-Passwort eingeben"
+                           styleClass="text-input"/>
+        </VBox>
 
-    <!-- Fehlermeldungsanzeige (rot eingefärbt) -->
-    <Label fx:id="errorLabel" textFill="red" />
+        <Label fx:id="errorLabel" styleClass="error-label" wrapText="true" maxWidth="Infinity"/>
 
-    <!-- Login-Button: ruft onLogin() im Controller auf -->
-    <Button text="Login" onAction="#onLogin" />
+        <Button text="Einloggen" onAction="#onLogin" maxWidth="Infinity" styleClass="primary-button"/>
 
-    <!-- Button zum Öffnen des Registrierungsdialogs -->
-    <Button text="Neuen Benutzer anlegen" onAction="#onOpenRegister" />
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Benutzer anlegen" onAction="#onOpenRegister" styleClass="secondary-button"/>
+            <Button text="Passwort vergessen" onAction="#onOpenRecovery" styleClass="secondary-button"/>
+        </HBox>
+    </VBox>
 
-    <!-- Button zum Öffnen des Passwort-Wiederherstellungsdialogs -->
-    <Button text="Passwort vergessen?" onAction="#onOpenRecovery" />
+    <Label text="Keine Cloud. Keine Synchronisierung. Lokale Speicherung." styleClass="footer-note"/>
 
 </VBox>

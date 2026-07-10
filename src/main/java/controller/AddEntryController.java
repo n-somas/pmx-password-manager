@@ -69,7 +69,7 @@ public class AddEntryController {
         String newPass = PasswordGenerator.generate(12, true, true, true, true);
         passwordField.setText(newPass);
 
-        int score = PasswordGenerator.strengthScore(newPass); // 0..100
+        int score = PasswordGenerator.strengthScore100(newPass); // 0..100
         strengthLabel.setText("Passwortstärke: " + score);
     }
 
@@ -135,7 +135,7 @@ public class AddEntryController {
     // Anzeige der Passwortstärke aktualisieren
     private void updateStrength(String pw) {
         if (strengthLabel == null) return;
-        int score = PasswordGenerator.strengthScore(pw); // 0..100
+        int score = PasswordGenerator.strengthScore100(pw); // 0..100
         String text;
         Color color;
 

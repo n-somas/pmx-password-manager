@@ -81,7 +81,7 @@ public class LoginController {
             Parent root = loader.load();
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Passwort Tresor");
+            stage.setTitle("PasswortManagerX â€“ Tresor");
             // stage.show(); // nicht nötig, vorhandenes Fenster
 
         } catch (Exception e) {
