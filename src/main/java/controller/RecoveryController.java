@@ -48,7 +48,7 @@ public class RecoveryController {
         }
 
         try {
-            // 1) Recovery-Key gegen gespeicherten Hash prüfen (mit recoverySalt)
+            // 1) Recovery Key gegen gespeicherten Hash prüfen (mit recoverySalt)
             String recHash  = userRepo.getRecoveryHash(username);
             String recSaltB = userRepo.getRecoverySalt(username);
             if (recHash == null || recSaltB == null) {
@@ -58,7 +58,7 @@ public class RecoveryController {
             byte[] recHashSalt = HashUtil.decodeBase64(recSaltB);     // nur für Hashvergleich
             String recCalc = HashUtil.hashWithSalt(recoveryKey, recHashSalt);
             if (!recHash.equals(recCalc)) {
-                show("Recovery-Key ist ungültig.");
+                show("Recovery Key ist ungültig.");
                 return;
             }
 

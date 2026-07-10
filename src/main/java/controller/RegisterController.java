@@ -13,7 +13,7 @@ import crypto.KeyStoreService;           // KEK-Ableitung, Wrap/Unwrap, DEK
 import javafx.fxml.FXML;                 // @FXML-Bindings
 import javafx.scene.control.Label;       // Meldungen
 import javafx.scene.control.PasswordField; // Passwort-Eingaben
-import javafx.scene.control.TextField;   // Text-/Recovery-Key-Anzeige
+import javafx.scene.control.TextField;   // Text-/Recovery Key-Anzeige
 
 import java.security.SecureRandom;
 
@@ -64,12 +64,12 @@ public class RegisterController {
         }
 
         try {
-            // 1) Recovery-Key (kurzes, gut ablesbares Format)
+            // 1) Recovery Key (kurzes, gut ablesbares Format)
             String recoveryKey = generateRecoveryKey();
             recoveryKeyField.setText(recoveryKey);
             recoveryKeyField.selectAll();
 
-            // 2) Recovery-Key als Hash speichern (mit eigenem Salt)
+            // 2) Recovery Key als Hash speichern (mit eigenem Salt)
             byte[] recSalt = HashUtil.generateSalt();
             String recSaltB64 = HashUtil.encodeBase64(recSalt);
             String recHash = HashUtil.hashWithSalt(recoveryKey, recSalt);
@@ -85,7 +85,7 @@ public class RegisterController {
             byte[] kekPw  = KeyStoreService.deriveKek(pw1.toCharArray(), saltPw);
             KeyStoreService.Wrapped wPw = KeyStoreService.wrapKey(dek, kekPw);
 
-            // 6) DEK mit Recovery-Key wrappen (Recovery-Salt)
+            // 6) DEK mit Recovery Key wrappen (Recovery-Salt)
             byte[] saltRec = KeyStoreService.random(16);
             byte[] kekRec  = KeyStoreService.deriveKek(recoveryKey.toCharArray(), saltRec);
             KeyStoreService.Wrapped wRec = KeyStoreService.wrapKey(dek, kekRec);
@@ -97,7 +97,7 @@ public class RegisterController {
                     wRec.ctB64(), wRec.ivB64(), HashUtil.encodeBase64(saltRec)
             );
 
-            show("Benutzer erstellt! Recovery-Key angezeigt – bitte sicher aufbewahren.");
+            show("Benutzer erstellt! Recovery Key angezeigt – bitte sicher aufbewahren.");
         } catch (Exception e) {
             e.printStackTrace();
             show("Fehler beim Erstellen des Benutzers.");

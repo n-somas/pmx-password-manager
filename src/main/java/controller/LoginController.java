@@ -2,7 +2,7 @@ package controller;
 
 
 
-// App-Status (aktueller Benutzer, Master-Passwort, DEK)
+// App-Status (aktueller Benutzer, Master Passwort, DEK)
 import app.AppState;
 
 // Datenbank-Zugriff
@@ -57,7 +57,7 @@ public class LoginController {
                 return;
             }
 
-            // 2) AppState aktualisieren (User + Master-Passwort im RAM)
+            // 2) AppState aktualisieren (User + Master Passwort im RAM)
             AppState.getInstance().setCurrentUser(username);
             AppState.getInstance().setMasterPassword(password.toCharArray());
 
@@ -85,7 +85,7 @@ public class LoginController {
             Parent root = loader.load();
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("PMX - Tresor");
+            stage.setTitle("PMX Tresor");
             // stage.show(); // nicht nötig, vorhandenes Fenster
 
         } catch (Exception e) {

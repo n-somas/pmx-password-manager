@@ -352,7 +352,7 @@ public class VaultController {
 
             Stage stage = (Stage) vaultTable.getScene().getWindow();
             stage.setScene(new Scene(root, 480, 560));
-            stage.setTitle("PMX - Login");
+            stage.setTitle("PMX Login");
         } catch (IOException ex) {
             ex.printStackTrace();
             showModal("Fehler", "Login konnte nicht geladen werden.");
