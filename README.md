@@ -1,4 +1,4 @@
-﻿# PMX
+# PMX - Lokaler Passwortmanager
 
 Ein lokaler Offline-Passwortmanager, entwickelt mit **Java**, **JavaFX**, **SQLite** und **NitriteDB**.
 
@@ -6,8 +6,9 @@ Ein lokaler Offline-Passwortmanager, entwickelt mit **Java**, **JavaFX**, **SQLi
 
 ## Ãœberblick
 
-Dieses Projekt wurde im Rahmen meiner Umschulung zum **Fachinformatiker fÃ¼r Anwendungsentwicklung** entwickelt.  
-Ziel war die Umsetzung eines lokalen Passwort-Managers mit Fokus auf **Sicherheit**, **Offline-Betrieb** und **klarer BenutzerfÃ¼hrung**.
+PMX wurde im Rahmen meiner Umschulung zum **Fachinformatiker fÃ¼r Anwendungsentwicklung** entwickelt.
+
+Ziel war die Umsetzung eines lokalen Passwortmanagers mit Fokus auf **Sicherheit**, **Offline-Betrieb** und **klarer BenutzerfÃ¼hrung**. Die Anwendung speichert Zugangsdaten lokal, verschlÃ¼sselt sensible Daten und verzichtet bewusst auf Cloud-Synchronisierung.
 
 ## Funktionen
 
@@ -16,7 +17,8 @@ Ziel war die Umsetzung eines lokalen Passwort-Managers mit Fokus auf **Sicherhei
 - Passwortgenerator
 - Recovery-Funktion
 - Ãœbersichtliche Tresoransicht fÃ¼r gespeicherte EintrÃ¤ge
-- Offline-Nutzung ohne Cloud-Anbindung
+- Suche nach Website oder Benutzername
+- EintrÃ¤ge hinzufÃ¼gen, bearbeiten und lÃ¶schen
 
 ## Technologien
 
@@ -33,19 +35,9 @@ Ziel war die Umsetzung eines lokalen Passwort-Managers mit Fokus auf **Sicherhei
 - **PBKDF2-HMAC-SHA-256** zur SchlÃ¼sselableitung
 - Trennung von Benutzerverwaltung und Tresordaten
 - Keine Speicherung produktiver Daten im Repository
-- Keine Cloud-Dienste oder externe Synchronisierung
+- Lokaler Betrieb ohne externe Synchronisierung
 
-## Projektstruktur
-
-```text
-src/
-â”œâ”€ main/
-â”‚  â”œâ”€ java/
-â”‚  â””â”€ resources/
-â””â”€ test/
-   â””â”€ java/
-```
-## Start des Projekts
+## Projekt lokal starten
 
 ### Voraussetzungen
 
@@ -53,31 +45,38 @@ src/
 - Maven
 - IntelliJ IDEA oder eine andere Java-IDE
 
-### Projekt lokal starten
+### Start
 
 1. Repository klonen:
 
    ```bash
-   git clone https://github.com/n-somas/tozen-password-manager.git
+   git clone https://github.com/n-somas/pmx-password-manager.git
    ```
 
 2. In den Projektordner wechseln:
 
    ```bash
-   cd tozen-password-manager
+   cd pmx-password-manager
    ```
 
-3. Das Projekt in IntelliJ IDEA Ã¶ffnen.
+3. Maven-AbhÃ¤ngigkeiten laden:
 
-4. Maven-AbhÃ¤ngigkeiten laden.
+   ```bash
+   mvn clean install
+   ```
 
-5. Die Anwendung Ã¼ber die Main-Klasse in der IDE starten.
+4. Anwendung starten:
+
+   ```bash
+   mvn javafx:run
+   ```
 
 ### Tests ausfÃ¼hren
 
 ```bash
 mvn test
 ```
+
 ## Screenshots
 
 ### Login und Tresor
@@ -90,21 +89,19 @@ mvn test
   <img src="docs/screenshots/vault.png" alt="Tresor" width="700">
 </p>
 
-### Einträge verwalten
+### EintrÃ¤ge verwalten
 
 <p>
-  <img src="docs/screenshots/add-entry.png" alt="Eintrag hinzufügen" width="360">
+  <img src="docs/screenshots/add-entry.png" alt="Eintrag hinzufÃ¼gen" width="360">
   <img src="docs/screenshots/edit-entry.png" alt="Eintrag bearbeiten" width="360">
 </p>
 
-### Löschen-Dialog
+### LÃ¶schen-Dialog
 
 <p>
-  <img src="docs/screenshots/delete-dialog.png" alt="Löschen-Dialog" width="420">
+  <img src="docs/screenshots/delete-dialog.png" alt="LÃ¶schen-Dialog" width="420">
 </p>
 
 ## Autor
 
-**Niloshan Somasundaram**  
-
-
+**Niloshan Somasundaram**
