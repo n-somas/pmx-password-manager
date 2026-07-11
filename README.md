@@ -1,18 +1,18 @@
 # PMX - Lokaler Passwortmanager
 
-**PMX** ist ein lokaler Offline-Passwortmanager als JavaFX-Desktopanwendung.  
-Das Projekt zeigt eine vollständige Benutzeroberfläche mit Login, Tresoransicht, Eintragsverwaltung, Passwortgenerator und lokaler Verschlüsselung.
+**PMX** ist ein lokaler Offline Passwortmanager als JavaFX Desktopanwendung.  
+Das Projekt verbindet Java, JavaFX, lokale Datenhaltung, Verschlüsselung, Benutzerführung und GitHub Dokumentation in einer vollständigen Desktopanwendung.
 
 > **Hinweis:** Dieses Repository ist ein Demo- und Bewerbungsprojekt. Es enthält keine produktiven Benutzerdaten, keine echten Zugangsdaten und keine sensiblen lokalen Datenbanken.
 
 ## Projektfokus
 
-- Lokale Desktop-Anwendung ohne Cloud-Synchronisierung
-- Moderne JavaFX-Oberfläche mit dunklem PMX-Design
+- Lokale Desktop Anwendung ohne Cloud Synchronisierung
+- Moderne JavaFX Oberfläche mit dunklem PMX Design
 - Verschlüsselte Speicherung sensibler Zugangsdaten
-- Benutzerregistrierung, Login und Recovery-Funktion
-- Übersichtliche Tresoransicht mit Suche, Bearbeiten- und Löschfunktion
-- Sicherheitsbewusster Aufbau mit Master Passwort, Schlüsselableitung und AES-GCM-Verschlüsselung
+- Benutzerregistrierung, Login und Recovery Funktion
+- Tresoransicht mit Suche, Bearbeiten und Löschen
+- Sicherheitsnahe Funktionen wie zeitlich begrenztes Anzeigen, automatisches Leeren der Zwischenablage und Passwort Alter Status
 
 ## Screenshots
 
@@ -47,25 +47,71 @@ Das Projekt zeigt eine vollständige Benutzeroberfläche mit Login, Tresoransich
 - Zugangsdaten lokal speichern
 - Einträge suchen, hinzufügen, bearbeiten und löschen
 - Passwortgenerator für neue Zugangsdaten
-- Recovery-Funktion für das Zurücksetzen des Master Passworts
-- Getrennte Speicherung von Benutzer- und Tresordaten
-
-## Technologien
-
-- Java 17
-- JavaFX
-- Maven
-- SQLite
-- NitriteDB
-- JUnit 5
+- Recovery Funktion für das Zurücksetzen des Master Passworts
+- Getrennte Speicherung von Benutzer und Tresordaten
+- Änderungsdatum pro Eintrag
+- Passwort Alter Status mit den Zuständen `Aktuell`, `Prüfen` und `Alt`
+- Passwort zeitlich begrenzt anzeigen
+- Passwort in die Zwischenablage kopieren
+- Zwischenablage nach kurzer Zeit automatisch leeren
 
 ## Sicherheitskonzept
 
 - **AES-256-GCM** zur Verschlüsselung sensibler Daten
 - **PBKDF2-HMAC-SHA-256** zur Schlüsselableitung
-- Trennung von Benutzerverwaltung und Tresordaten
-- Keine produktiven Daten im Repository
-- Lokaler Betrieb ohne externe Synchronisierung
+- Lokale Speicherung ohne externe Synchronisierung
+- Keine Speicherung produktiver Daten im Repository
+- Passwortanzeige wird nach kurzer Zeit automatisch wieder maskiert
+- Kopierte Passwörter werden nach 20 Sekunden aus der Zwischenablage entfernt, sofern dort noch genau dieses Passwort enthalten ist
+- Passwort Alter Status unterstützt den Nutzer dabei, alte Zugangsdaten zu erkennen
+
+## Technische Details
+
+### Eintragsmetadaten
+
+Jeder Tresoreintrag besitzt Metadaten:
+
+```text
+createdAt
+updatedAt
+passwordChangedAt
+```
+
+Damit kann PMX unterscheiden, ob ein Eintrag allgemein bearbeitet wurde oder ob tatsächlich das Passwort geändert wurde.
+
+### Passwort Alter Status
+
+Der Status wird aus `passwordChangedAt` berechnet:
+
+```text
+Aktuell  = Passwort wurde kürzlich geändert
+Prüfen   = Passwort sollte geprüft werden
+Alt      = Passwort ist länger nicht geändert worden
+```
+
+Diese Funktion ist bewusst einfach gehalten, aber fachlich sinnvoll für einen Passwortmanager.
+
+### Zeitlich begrenzte Passwortanzeige
+
+Beim Klick auf Anzeigen wird das Passwort entschlüsselt und nur kurz sichtbar gemacht.  
+Nach Ablauf des Timers wird die Tabellenanzeige wieder maskiert.
+
+### Sicheres Kopieren
+
+Beim Kopieren wird das Passwort in die Systemzwischenablage gelegt.  
+Nach 20 Sekunden prüft PMX, ob die Zwischenablage noch genau dieses Passwort enthält. Nur dann wird sie geleert. Dadurch wird nicht versehentlich ein anderer kopierter Inhalt des Nutzers gelöscht.
+
+## Technologien
+
+- Java 17
+- JavaFX
+- FXML
+- CSS
+- Maven
+- SQLite
+- NitriteDB
+- JUnit 5
+- Git und GitHub
 
 ## Projekt lokal starten
 
@@ -73,7 +119,7 @@ Das Projekt zeigt eine vollständige Benutzeroberfläche mit Login, Tresoransich
 
 - Java 17 oder neuer
 - Maven
-- IntelliJ IDEA oder eine andere Java-IDE
+- IntelliJ IDEA oder eine andere Java IDE
 
 ### Start
 
@@ -89,7 +135,7 @@ In den Projektordner wechseln:
 cd pmx-password-manager
 ```
 
-Abhängigkeiten laden und Tests ausführen:
+Tests ausführen:
 
 ```bash
 mvn clean test
@@ -103,7 +149,9 @@ mvn javafx:run
 
 ## Projektstatus
 
-PMX ist ein Bewerbungs- und Lernprojekt mit Fokus auf Java, JavaFX, lokaler Datenhaltung, Verschlüsselung und sauberer Benutzerführung.
+PMX ist ein Bewerbungs- und Lernprojekt mit Fokus auf Java, JavaFX, lokaler Datenhaltung, Verschlüsselung, UI Entwicklung und sauberer Dokumentation.
+
+Es ist kein produktiv auditierter Passwortmanager. Für einen produktiven Einsatz wären weitere Security Reviews, Tests, Schutzmaßnahmen und Audits notwendig.
 
 ## Autor
 
