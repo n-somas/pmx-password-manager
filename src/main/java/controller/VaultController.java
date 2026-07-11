@@ -31,14 +31,18 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.VaultEntry;
+import service.BackupService;
 import util.EncryptionUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class VaultController {
@@ -340,6 +344,108 @@ public class VaultController {
             e.printStackTrace();
             showModal("Fehler", "Der Dialog konnte nicht geöffnet werden.");
         }
+    }
+
+    @FXML
+    private void onExportBackup() {
+        if (entries.isEmpty()) {
+            showModal("Hinweis", "Es sind keine Einträge für den Export vorhanden.");
+            return;
+        }
+
+        byte[] dataKey = AppState.getInstance().getDataKey();
+
+        if (dataKey == null || dataKey.length == 0) {
+            showModal("Fehler", "Kein Daten Schlüssel vorhanden. Bitte neu einloggen.");
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("PMX Backup exportieren");
+        chooser.setInitialFileName("pmx-backup.pmx");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PMX Backup", "*.pmx"));
+
+        File targetFile = chooser.showSaveDialog(vaultTable.getScene().getWindow());
+
+        if (targetFile == null) {
+            return;
+        }
+
+        try {
+            int count = BackupService.exportBackup(targetFile, entries, dataKey);
+            showModal("Backup exportiert", count + " Einträge wurden verschlüsselt exportiert.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showModal("Fehler", "Backup konnte nicht exportiert werden.");
+        }
+    }
+
+    @FXML
+    private void onImportBackup() {
+        byte[] dataKey = AppState.getInstance().getDataKey();
+
+        if (dataKey == null || dataKey.length == 0) {
+            showModal("Fehler", "Kein Daten Schlüssel vorhanden. Bitte neu einloggen.");
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("PMX Backup importieren");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PMX Backup", "*.pmx"));
+
+        File sourceFile = chooser.showOpenDialog(vaultTable.getScene().getWindow());
+
+        if (sourceFile == null) {
+            return;
+        }
+
+        try {
+            List<VaultEntry> importedEntries = BackupService.importBackup(sourceFile, dataKey);
+
+            int imported = 0;
+            int updated = 0;
+
+            for (VaultEntry importedEntry : importedEntries) {
+                importedEntry.ensureMetadata();
+
+                VaultEntry existing = findByWebsite(importedEntry.getWebsite());
+
+                if (existing == null) {
+                    DatabaseHelper.addEntry(importedEntry);
+                    entries.add(importedEntry);
+                    imported++;
+                } else {
+                    DatabaseHelper.upsert(importedEntry);
+
+                    int index = entries.indexOf(existing);
+                    if (index >= 0) {
+                        entries.set(index, importedEntry);
+                    }
+
+                    updated++;
+                }
+            }
+
+            vaultTable.refresh();
+            showModal("Backup importiert", imported + " neue Einträge importiert, " + updated + " vorhandene Einträge aktualisiert.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showModal("Fehler", "Backup konnte nicht importiert werden. Datei oder Schlüssel passt nicht.");
+        }
+    }
+
+    private VaultEntry findByWebsite(String website) {
+        if (website == null) {
+            return null;
+        }
+
+        for (VaultEntry entry : entries) {
+            if (website.equals(entry.getWebsite())) {
+                return entry;
+            }
+        }
+
+        return null;
     }
 
     private void onEditSelected() {

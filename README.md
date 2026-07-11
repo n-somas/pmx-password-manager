@@ -12,7 +12,7 @@ Das Projekt verbindet Java, JavaFX, lokale Datenhaltung, Verschlüsselung, Benut
 - Verschlüsselte Speicherung sensibler Zugangsdaten
 - Benutzerregistrierung, Login und Recovery Funktion
 - Tresoransicht mit Suche, Bearbeiten und Löschen
-- Sicherheitsnahe Funktionen wie zeitlich begrenztes Anzeigen, automatisches Leeren der Zwischenablage und Passwort Alter Status
+- Sicherheitsnahe Funktionen wie zeitlich begrenztes Anzeigen, automatisches Leeren der Zwischenablage, Passwort Alter Status und verschlüsselte Backups
 
 ## Screenshots
 
@@ -54,6 +54,8 @@ Das Projekt verbindet Java, JavaFX, lokale Datenhaltung, Verschlüsselung, Benut
 - Passwort zeitlich begrenzt anzeigen
 - Passwort in die Zwischenablage kopieren
 - Zwischenablage nach kurzer Zeit automatisch leeren
+- Verschlüsselter Backup Export
+- Verschlüsselter Backup Import
 
 ## Sicherheitskonzept
 
@@ -64,6 +66,7 @@ Das Projekt verbindet Java, JavaFX, lokale Datenhaltung, Verschlüsselung, Benut
 - Passwortanzeige wird nach kurzer Zeit automatisch wieder maskiert
 - Kopierte Passwörter werden nach 20 Sekunden aus der Zwischenablage entfernt, sofern dort noch genau dieses Passwort enthalten ist
 - Passwort Alter Status unterstützt den Nutzer dabei, alte Zugangsdaten zu erkennen
+- Backup Dateien werden nicht als Klartext exportiert, sondern verschlüsselt gespeichert
 
 ## Technische Details
 
@@ -101,6 +104,18 @@ Nach Ablauf des Timers wird die Tabellenanzeige wieder maskiert.
 Beim Kopieren wird das Passwort in die Systemzwischenablage gelegt.  
 Nach 20 Sekunden prüft PMX, ob die Zwischenablage noch genau dieses Passwort enthält. Nur dann wird sie geleert. Dadurch wird nicht versehentlich ein anderer kopierter Inhalt des Nutzers gelöscht.
 
+### Verschlüsselte Backups
+
+PMX kann Tresoreinträge als verschlüsselte Backup Datei exportieren und wieder importieren.  
+Die Backup Datei besitzt ein eigenes PMX Format und speichert die Daten nicht als lesbaren Klartext.
+
+```text
+PMX-BACKUP-1
+<verschlüsselte Backup Daten>
+```
+
+Beim Import wird die Datei entschlüsselt, geprüft und anschließend werden neue Einträge ergänzt oder bestehende Einträge aktualisiert.
+
 ## Technologien
 
 - Java 17
@@ -110,6 +125,7 @@ Nach 20 Sekunden prüft PMX, ob die Zwischenablage noch genau dieses Passwort en
 - Maven
 - SQLite
 - NitriteDB
+- Gson
 - JUnit 5
 - Git und GitHub
 

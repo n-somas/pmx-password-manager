@@ -6,7 +6,7 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="controller.VaultController"
-      prefWidth="1080.0" prefHeight="700.0"
+      prefWidth="1120.0" prefHeight="700.0"
       styleClass="app-shell"
       stylesheets="@styles.css">
 
@@ -23,12 +23,14 @@
     </HBox>
 
     <VBox styleClass="content-area-clean" VBox.vgrow="ALWAYS">
-        <HBox alignment="CENTER_LEFT" spacing="14">
+        <HBox alignment="CENTER_LEFT" spacing="12">
             <VBox spacing="5" HBox.hgrow="ALWAYS">
                 <Label text="Tresor" styleClass="page-title"/>
                 <Label text="Lokale Zugangsdaten verwalten und verschlüsselt speichern." styleClass="page-subtitle"/>
             </VBox>
 
+            <Button text="Backup exportieren" onAction="#onExportBackup" styleClass="secondary-button"/>
+            <Button text="Backup importieren" onAction="#onImportBackup" styleClass="secondary-button"/>
             <Button text="+ Neuer Eintrag" onAction="#onAddEntry" styleClass="ghost-button"/>
             <Button text="Ausloggen" onAction="#onLogout" styleClass="logout-button"/>
         </HBox>
