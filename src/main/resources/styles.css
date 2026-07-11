@@ -598,3 +598,28 @@
     -fx-max-height: 24;
     -fx-padding: 0;
 }
+
+/* Feature: Passwort-Metadaten und Statusanzeige */
+.age-ok-cell {
+    -fx-text-fill: #7ee787;
+    -fx-font-weight: 800;
+}
+
+.age-check-cell {
+    -fx-text-fill: #f5c542;
+    -fx-font-weight: 800;
+}
+
+.age-old-cell {
+    -fx-text-fill: #ff6b7a;
+    -fx-font-weight: 900;
+}
+
+.icon-copy {
+    -fx-background-color: rgba(20, 184, 166, 0.14);
+    -fx-border-color: rgba(20, 184, 166, 0.34);
+}
+
+.icon-copy:hover {
+    -fx-background-color: rgba(20, 184, 166, 0.24);
+}

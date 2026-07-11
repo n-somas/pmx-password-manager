@@ -6,12 +6,12 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="controller.VaultController"
-      prefWidth="980.0" prefHeight="670.0"
+      prefWidth="1080.0" prefHeight="700.0"
       styleClass="app-shell"
       stylesheets="@styles.css">
 
     <HBox alignment="CENTER_LEFT"
-          spacing="10"
+          spacing="6"
           styleClass="title-bar"
           onMousePressed="#onWindowMousePressed"
           onMouseDragged="#onWindowMouseDragged">
@@ -43,6 +43,8 @@
                     <TableColumn fx:id="websiteColumn" text="Webseite"/>
                     <TableColumn fx:id="usernameColumn" text="Benutzername"/>
                     <TableColumn fx:id="passwordColumn" text="Passwort"/>
+                    <TableColumn fx:id="updatedAtColumn" text="Geändert"/>
+                    <TableColumn fx:id="passwordAgeColumn" text="Status"/>
                     <TableColumn fx:id="actionColumn" text="Aktion"/>
                 </columns>
             </TableView>

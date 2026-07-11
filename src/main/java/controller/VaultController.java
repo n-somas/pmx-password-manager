@@ -2,6 +2,8 @@ package controller;
 
 import app.AppState;
 import db.DatabaseHelper;
+import javafx.animation.PauseTransition;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -22,7 +24,8 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -30,12 +33,18 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import model.VaultEntry;
 import util.EncryptionUtil;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VaultController {
+
+    private static final int PASSWORD_REVEAL_SECONDS = 10;
+    private static final int CLIPBOARD_CLEAR_SECONDS = 20;
 
     private double windowDragOffsetX;
     private double windowDragOffsetY;
@@ -44,18 +53,31 @@ public class VaultController {
     @FXML private TableColumn<VaultEntry, String> websiteColumn;
     @FXML private TableColumn<VaultEntry, String> usernameColumn;
     @FXML private TableColumn<VaultEntry, String> passwordColumn;
+    @FXML private TableColumn<VaultEntry, String> updatedAtColumn;
+    @FXML private TableColumn<VaultEntry, String> passwordAgeColumn;
     @FXML private TableColumn<VaultEntry, Void> actionColumn;
     @FXML private TextField searchField;
 
     private final ObservableList<VaultEntry> entries = FXCollections.observableArrayList();
+    private final Map<String, String> revealedPasswords = new HashMap<>();
+    private final Map<String, PauseTransition> revealTimers = new HashMap<>();
 
     @FXML
     public void initialize() {
         configureTableLayout();
 
-        websiteColumn.setCellValueFactory(new PropertyValueFactory<>("website"));
-        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        passwordColumn.setCellValueFactory(new PropertyValueFactory<>("passwordMasked"));
+        websiteColumn.setCellValueFactory(data -> new SimpleStringProperty(nullSafe(data.getValue().getWebsite())));
+        usernameColumn.setCellValueFactory(data -> new SimpleStringProperty(nullSafe(data.getValue().getUsername())));
+        passwordColumn.setCellValueFactory(data -> new SimpleStringProperty(displayPassword(data.getValue())));
+
+        if (updatedAtColumn != null) {
+            updatedAtColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getUpdatedAtDisplay()));
+        }
+
+        if (passwordAgeColumn != null) {
+            passwordAgeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPasswordAgeStatus()));
+            configurePasswordAgeColumn();
+        }
 
         configureActionColumn();
         reloadFromDb();
@@ -67,22 +89,73 @@ public class VaultController {
         vaultTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         websiteColumn.setMinWidth(170);
-        usernameColumn.setMinWidth(170);
-        passwordColumn.setMinWidth(140);
+        usernameColumn.setMinWidth(160);
+        passwordColumn.setMinWidth(130);
 
-        actionColumn.setMinWidth(170);
-        actionColumn.setPrefWidth(180);
-        actionColumn.setMaxWidth(200);
+        if (updatedAtColumn != null) {
+            updatedAtColumn.setMinWidth(100);
+            updatedAtColumn.setPrefWidth(110);
+            updatedAtColumn.setMaxWidth(130);
+        }
+
+        if (passwordAgeColumn != null) {
+            passwordAgeColumn.setMinWidth(95);
+            passwordAgeColumn.setPrefWidth(105);
+            passwordAgeColumn.setMaxWidth(120);
+        }
+
+        actionColumn.setMinWidth(205);
+        actionColumn.setPrefWidth(215);
+        actionColumn.setMaxWidth(230);
         actionColumn.setResizable(false);
         actionColumn.setSortable(false);
+    }
+
+    private void configurePasswordAgeColumn() {
+        passwordAgeColumn.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                getStyleClass().removeAll("age-ok-cell", "age-check-cell", "age-old-cell");
+                setTooltip(null);
+
+                if (empty || item == null) {
+                    setText(null);
+                    return;
+                }
+
+                VaultEntry entry = getTableRow() == null ? null : getTableRow().getItem();
+                setText(item);
+                setAlignment(Pos.CENTER);
+
+                if (entry != null) {
+                    setTooltip(new Tooltip(entry.getPasswordAgeTooltip()));
+
+                    if (entry.isPasswordOld()) {
+                        getStyleClass().add("age-old-cell");
+                    } else if (entry.shouldCheckPassword()) {
+                        getStyleClass().add("age-check-cell");
+                    } else {
+                        getStyleClass().add("age-ok-cell");
+                    }
+                }
+            }
+        });
     }
 
     private void configureActionColumn() {
         actionColumn.setCellFactory(col -> new TableCell<>() {
             private final Button viewButton = iconButton(
-                    "Anzeigen",
+                    "10 Sekunden anzeigen",
                     "M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zm0 12a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2.2a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6z",
                     "icon-view"
+            );
+
+            private final Button copyButton = iconButton(
+                    "Kopieren",
+                    "M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z",
+                    "icon-copy"
             );
 
             private final Button editButton = iconButton(
@@ -97,14 +170,19 @@ public class VaultController {
                     "icon-delete"
             );
 
-            private final HBox box = new HBox(10, viewButton, editButton, deleteButton);
+            private final HBox box = new HBox(8, viewButton, copyButton, editButton, deleteButton);
 
             {
                 box.setAlignment(Pos.CENTER);
 
                 viewButton.setOnAction(e -> {
                     VaultEntry entry = getEntry();
-                    if (entry != null) showPassword(entry);
+                    if (entry != null) revealPasswordTemporarily(entry);
+                });
+
+                copyButton.setOnAction(e -> {
+                    VaultEntry entry = getEntry();
+                    if (entry != null) copyPasswordToClipboard(entry);
                 });
 
                 editButton.setOnAction(e -> {
@@ -126,9 +204,11 @@ public class VaultController {
 
             private VaultEntry getEntry() {
                 int index = getIndex();
+
                 if (index < 0 || index >= getTableView().getItems().size()) {
                     return null;
                 }
+
                 return getTableView().getItems().get(index);
             }
         });
@@ -138,16 +218,16 @@ public class VaultController {
         SVGPath icon = new SVGPath();
         icon.setContent(svgPath);
         icon.getStyleClass().addAll("action-icon", extraClass + "-shape");
-        icon.setScaleX(0.78);
-        icon.setScaleY(0.78);
+        icon.setScaleX(0.72);
+        icon.setScaleY(0.72);
 
         Button button = new Button();
         button.setGraphic(icon);
         button.getStyleClass().addAll("icon-button", extraClass);
         button.setTooltip(new Tooltip(tooltipText));
-        button.setMinWidth(40);
-        button.setPrefWidth(40);
-        button.setMaxWidth(40);
+        button.setMinWidth(38);
+        button.setPrefWidth(38);
+        button.setMaxWidth(38);
         button.setMinHeight(34);
         button.setPrefHeight(34);
         button.setFocusTraversable(false);
@@ -164,7 +244,9 @@ public class VaultController {
                 String query = (newV == null ? "" : newV.trim().toLowerCase());
 
                 filtered.setPredicate(entry -> {
-                    if (query.isEmpty()) return true;
+                    if (query.isEmpty()) {
+                        return true;
+                    }
 
                     String website = entry.getWebsite() == null ? "" : entry.getWebsite().toLowerCase();
                     String username = entry.getUsername() == null ? "" : entry.getUsername().toLowerCase();
@@ -181,10 +263,23 @@ public class VaultController {
 
     private void configureContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
+        MenuItem showItem = new MenuItem("10 Sekunden anzeigen");
+        MenuItem copyItem = new MenuItem("Kopieren");
         MenuItem editItem = new MenuItem("Bearbeiten");
         MenuItem deleteItem = new MenuItem("Löschen");
 
-        contextMenu.getItems().addAll(editItem, deleteItem);
+        contextMenu.getItems().addAll(showItem, copyItem, editItem, deleteItem);
+
+        showItem.setOnAction(e -> {
+            VaultEntry selected = vaultTable.getSelectionModel().getSelectedItem();
+            if (selected != null) revealPasswordTemporarily(selected);
+        });
+
+        copyItem.setOnAction(e -> {
+            VaultEntry selected = vaultTable.getSelectionModel().getSelectedItem();
+            if (selected != null) copyPasswordToClipboard(selected);
+        });
+
         editItem.setOnAction(e -> onEditSelected());
         deleteItem.setOnAction(e -> onDeleteSelected());
 
@@ -219,6 +314,8 @@ public class VaultController {
         }
 
         for (VaultEntry entry : DatabaseHelper.findAll()) {
+            entry.ensureMetadata();
+            DatabaseHelper.upsert(entry);
             entries.add(entry);
         }
     }
@@ -241,14 +338,15 @@ public class VaultController {
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
-            showModal("Fehler", "Der Dialog konnte nicht geoeffnet werden.");
+            showModal("Fehler", "Der Dialog konnte nicht geöffnet werden.");
         }
     }
 
     private void onEditSelected() {
         VaultEntry selected = vaultTable.getSelectionModel().getSelectedItem();
+
         if (selected == null) {
-            showModal("Hinweis", "Bitte zuerst einen Eintrag auswaehlen.");
+            showModal("Hinweis", "Bitte zuerst einen Eintrag auswählen.");
             return;
         }
 
@@ -257,29 +355,94 @@ public class VaultController {
 
     private void onDeleteSelected() {
         VaultEntry selected = vaultTable.getSelectionModel().getSelectedItem();
+
         if (selected == null) {
-            showModal("Hinweis", "Bitte zuerst einen Eintrag auswaehlen.");
+            showModal("Hinweis", "Bitte zuerst einen Eintrag auswählen.");
             return;
         }
 
         deleteEntry(selected);
     }
 
-    private void showPassword(VaultEntry entry) {
-        byte[] dek = AppState.getInstance().getDataKey();
+    private void revealPasswordTemporarily(VaultEntry entry) {
+        String plain = decryptPassword(entry);
 
-        if (dek == null || dek.length == 0) {
-            showModal("Fehler", "Kein Daten-Schluessel vorhanden. Bitte neu einloggen.");
+        if (plain == null) {
             return;
         }
 
+        String key = entryKey(entry);
+        revealedPasswords.put(key, plain);
+
+        PauseTransition oldTimer = revealTimers.remove(key);
+        if (oldTimer != null) {
+            oldTimer.stop();
+        }
+
+        PauseTransition timer = new PauseTransition(Duration.seconds(PASSWORD_REVEAL_SECONDS));
+        timer.setOnFinished(event -> {
+            revealedPasswords.remove(key);
+            revealTimers.remove(key);
+            vaultTable.refresh();
+        });
+
+        revealTimers.put(key, timer);
+        vaultTable.refresh();
+        timer.play();
+    }
+
+    private void copyPasswordToClipboard(VaultEntry entry) {
+        String plain = decryptPassword(entry);
+
+        if (plain == null) {
+            return;
+        }
+
+        ClipboardContent content = new ClipboardContent();
+        content.putString(plain);
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        clipboard.setContent(content);
+
+        PauseTransition clearTimer = new PauseTransition(Duration.seconds(CLIPBOARD_CLEAR_SECONDS));
+        clearTimer.setOnFinished(event -> {
+            String current = clipboard.hasString() ? clipboard.getString() : "";
+
+            if (plain.equals(current)) {
+                clipboard.clear();
+            }
+        });
+
+        clearTimer.play();
+        showModal("Kopiert", "Passwort wurde kopiert. Die Zwischenablage wird nach 20 Sekunden automatisch geleert.");
+    }
+
+    private String decryptPassword(VaultEntry entry) {
+        byte[] dek = AppState.getInstance().getDataKey();
+
+        if (dek == null || dek.length == 0) {
+            showModal("Fehler", "Kein Daten Schlüssel vorhanden. Bitte neu einloggen.");
+            return null;
+        }
+
         try {
-            String plain = EncryptionUtil.decrypt(entry.getPasswordEncrypted(), dek);
-            showModal("Passwort fuer " + entry.getWebsite(), plain);
+            return EncryptionUtil.decrypt(entry.getPasswordEncrypted(), dek);
         } catch (Exception ex) {
             ex.printStackTrace();
-            showModal("Fehler", "Entschluesselung fehlgeschlagen.");
+            showModal("Fehler", "Entschlüsselung fehlgeschlagen.");
+            return null;
         }
+    }
+
+    private String displayPassword(VaultEntry entry) {
+        if (entry == null) {
+            return "";
+        }
+
+        return revealedPasswords.getOrDefault(entryKey(entry), entry.getPasswordMasked());
+    }
+
+    private String entryKey(VaultEntry entry) {
+        return entry == null || entry.getWebsite() == null ? "" : entry.getWebsite();
     }
 
     private void editEntry(VaultEntry entry) {
@@ -300,7 +463,7 @@ public class VaultController {
             stage.show();
         } catch (IOException ex) {
             ex.printStackTrace();
-            showModal("Fehler", "Der Bearbeitungsdialog konnte nicht geoeffnet werden.");
+            showModal("Fehler", "Der Bearbeitungsdialog konnte nicht geöffnet werden.");
         }
     }
 
@@ -319,11 +482,14 @@ public class VaultController {
     }
 
     public void addVaultEntry(VaultEntry entry) {
+        entry.ensureMetadata();
         DatabaseHelper.addEntry(entry);
         entries.add(entry);
     }
 
     public void updateVaultEntry(String oldWebsite, VaultEntry updated) {
+        updated.ensureMetadata();
+
         if (!oldWebsite.equals(updated.getWebsite())) {
             DatabaseHelper.deleteByWebsite(oldWebsite);
             DatabaseHelper.addEntry(updated);
@@ -339,6 +505,10 @@ public class VaultController {
                 }
             }
         }
+
+        revealedPasswords.remove(oldWebsite);
+        revealedPasswords.remove(updated.getWebsite());
+        vaultTable.refresh();
     }
 
     @FXML
@@ -434,6 +604,10 @@ public class VaultController {
         modal.initStyle(javafx.stage.StageStyle.UNDECORATED);
         modal.setTitle("PMX");
         return modal;
+    }
+
+    private String nullSafe(String value) {
+        return value == null ? "" : value;
     }
 
     @FXML
