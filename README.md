@@ -1,5 +1,7 @@
 # PMX - Lokaler Passwortmanager
 
+[![Java CI](https://github.com/n-somas/pmx-password-manager/actions/workflows/maven.yml/badge.svg)](https://github.com/n-somas/pmx-password-manager/actions/workflows/maven.yml)
+
 **PMX** ist ein lokaler Offline Passwortmanager als JavaFX Desktopanwendung.  
 Das Projekt verbindet Java, JavaFX, lokale Datenhaltung, Verschlüsselung, Benutzerführung und GitHub Dokumentation in einer vollständigen Desktopanwendung.
 
