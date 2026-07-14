@@ -59,6 +59,7 @@ Das Projekt verbindet Java, JavaFX, lokale Datenhaltung, Verschlüsselung, Benut
 - Verschlüsselter Backup Export
 - Verschlüsselter Backup Import
 - Automatische Tresor Sperre nach Inaktivität
+- Login Sperre nach mehreren Fehlversuchen
 
 ## Sicherheitskonzept
 
@@ -71,6 +72,7 @@ Das Projekt verbindet Java, JavaFX, lokale Datenhaltung, Verschlüsselung, Benut
 - Passwort Alter Status unterstützt den Nutzer dabei, alte Zugangsdaten zu erkennen
 - Backup Dateien werden nicht als Klartext exportiert, sondern verschlüsselt gespeichert
 - Automatische Sperre schließt den Tresor nach Inaktivität und entfernt den aktiven Sitzungsschlüssel
+- Nach mehreren falschen Login Versuchen wird die Anmeldung kurzzeitig gesperrt
 
 ## Technische Details
 
@@ -119,6 +121,11 @@ PMX-BACKUP-1
 ```
 
 Beim Import wird die Datei entschlüsselt, geprüft und anschließend werden neue Einträge ergänzt oder bestehende Einträge aktualisiert.
+
+### Login Schutz
+
+PMX zählt fehlgeschlagene Login Versuche während der laufenden Sitzung.  
+Nach mehreren falschen Eingaben wird der Login für kurze Zeit gesperrt und der Login Button deaktiviert. Dadurch wird eine einfache Schutzlogik gegen wiederholte Fehlversuche umgesetzt.
 
 ## Architektur
 

@@ -1,105 +1,175 @@
 package controller;
 
-
-
-// App-Status (aktueller Benutzer, Master Passwort, DEK)
 import app.AppState;
-
-// Datenbank-Zugriff
-import db.UserRepository;              // Nutzer-Logins & Schlüssel laden
-import db.DatabaseHelper;              // Öffnet die Nitrite-DB (per Username)
-
-// Kryptografie & Hilfen
-import util.HashUtil;                  // Base64/Hash-Helfer
-import crypto.KeyStoreService;         // KEK-Ableitung & Key-Unwrap
-
-// JavaFX: Events, FXML, Laden & UI
-import javafx.event.ActionEvent;       // Button-/UI-Events
-import javafx.fxml.FXML;               // @FXML-Bindings
-import javafx.fxml.FXMLLoader;          // FXML-Dateien laden
-import javafx.scene.Parent;            // Root-Knoten
-import javafx.scene.Scene;             // Szene
-import javafx.scene.control.Label;     // Meldungen
-import javafx.scene.control.PasswordField; // Passwort-Eingabe
-import javafx.scene.control.TextField; // Text-Eingabe
+import crypto.KeyStoreService;
+import db.DatabaseHelper;
+import db.UserRepository;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import javafx.scene.input.MouseEvent;             // Fenster/Stage steuern
+import javafx.util.Duration;
+import util.HashUtil;
 
 public class LoginController {
+
+    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final int LOCK_SECONDS = 30;
 
     private double windowDragOffsetX;
     private double windowDragOffsetY;
 
-    // FXML-Felder
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label errorLabel;
+    @FXML private Button loginButton;
 
     private final UserRepository userRepo = new UserRepository();
 
-    // Login-Button
+    private int failedLoginAttempts = 0;
+    private int remainingLockSeconds = 0;
+    private Timeline lockTimeline;
+
     @FXML
     private void onLogin(ActionEvent event) {
-        String username = usernameField.getText().trim();
-        String password = passwordField.getText(); // bewusst nicht trimmen
+        if (isLoginLocked()) {
+            updateLockMessage();
+            return;
+        }
 
-        // Pflichtfelder prüfen
-        if (username.isEmpty() || password.isEmpty()) {
+        String username = usernameField.getText() == null ? "" : usernameField.getText().trim();
+        String password = passwordField.getText();
+
+        if (username.isEmpty() || password == null || password.isEmpty()) {
             errorLabel.setText("Bitte Benutzername und Passwort eingeben.");
             return;
         }
 
         try {
-            // 1) Passwort gegen SQLite prüfen
             boolean ok = userRepo.verifyLogin(username, password);
+
             if (!ok) {
-                errorLabel.setText("Login fehlgeschlagen!");
+                registerFailedLogin();
                 return;
             }
 
-            // 2) AppState aktualisieren (User + Master Passwort im RAM)
+            resetLoginProtection();
+
             AppState.getInstance().setCurrentUser(username);
             AppState.getInstance().setMasterPassword(password.toCharArray());
 
-            // 3) Wrapped Keys laden (aus DB)
             var wk = userRepo.loadWrappedKeys(username);
             if (wk == null || wk.dekPw() == null) {
                 errorLabel.setText("Kein Schlüsselmaterial gefunden.");
                 return;
             }
 
-            // 4) KEK aus Passwort + dek_pw_salt ableiten
             byte[] saltPw = HashUtil.decodeBase64(wk.dekPwSalt());
-            byte[] kekPw  = KeyStoreService.deriveKek(password.toCharArray(), saltPw);
+            byte[] kekPw = KeyStoreService.deriveKek(password.toCharArray(), saltPw);
 
-            // 5) DEK auspacken (unwrap)
             KeyStoreService.Wrapped wrapped = KeyStoreService.Wrapped.fromB64(wk.dekPw(), wk.dekPwIv());
             byte[] dek = KeyStoreService.unwrapKey(wrapped, kekPw);
 
-            // 6) DEK in AppState legen, Nitrite-DB (ohne DB-Passwort) per Username öffnen
             AppState.getInstance().setDataKey(dek);
             DatabaseHelper.initDatabase(username);
 
-            // 7) Vault laden (Scene-Wechsel)
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/vault.fxml"));
             Parent root = loader.load();
+
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("PMX Tresor");
-            // stage.show(); // nicht nötig, vorhandenes Fenster
-
         } catch (Exception e) {
             e.printStackTrace();
             errorLabel.setText("Unerwarteter Fehler beim Login.");
         }
     }
 
-    // Link/Knopf: Registrieren öffnen
+    private void registerFailedLogin() {
+        failedLoginAttempts++;
+
+        if (failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+            startLoginLock();
+            return;
+        }
+
+        errorLabel.setText("Login fehlgeschlagen. Versuch " + failedLoginAttempts + " von " + MAX_FAILED_ATTEMPTS + ".");
+    }
+
+    private void startLoginLock() {
+        remainingLockSeconds = LOCK_SECONDS;
+        setLoginControlsLocked(true);
+        updateLockMessage();
+
+        if (lockTimeline != null) {
+            lockTimeline.stop();
+        }
+
+        lockTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            remainingLockSeconds--;
+
+            if (remainingLockSeconds <= 0) {
+                stopLoginLock();
+            } else {
+                updateLockMessage();
+            }
+        }));
+
+        lockTimeline.setCycleCount(Timeline.INDEFINITE);
+        lockTimeline.playFromStart();
+    }
+
+    private void stopLoginLock() {
+        if (lockTimeline != null) {
+            lockTimeline.stop();
+        }
+
+        remainingLockSeconds = 0;
+        failedLoginAttempts = 0;
+        setLoginControlsLocked(false);
+        errorLabel.setText("Login wieder möglich.");
+    }
+
+    private void resetLoginProtection() {
+        if (lockTimeline != null) {
+            lockTimeline.stop();
+        }
+
+        remainingLockSeconds = 0;
+        failedLoginAttempts = 0;
+        setLoginControlsLocked(false);
+        errorLabel.setText("");
+    }
+
+    private boolean isLoginLocked() {
+        return remainingLockSeconds > 0;
+    }
+
+    private void updateLockMessage() {
+        errorLabel.setText("Zu viele Fehlversuche. Bitte " + remainingLockSeconds + " Sekunden warten.");
+    }
+
+    private void setLoginControlsLocked(boolean locked) {
+        if (loginButton != null) {
+            loginButton.setDisable(locked);
+        }
+    }
+
     @FXML
     private void onOpenRegister() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/register.fxml"));
             Parent root = loader.load();
+
             Stage stage = new Stage();
             stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
             stage.setTitle("PMX");
@@ -110,12 +180,12 @@ public class LoginController {
         }
     }
 
-    // Link/Knopf: Wiederherstellung öffnen
     @FXML
     private void onOpenRecovery() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/recovery.fxml"));
             Parent root = loader.load();
+
             Stage stage = new Stage();
             stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
             stage.setTitle("PMX");
@@ -147,6 +217,10 @@ public class LoginController {
 
     @FXML
     private void onCloseWindow() {
+        if (lockTimeline != null) {
+            lockTimeline.stop();
+        }
+
         Stage stage = (Stage) usernameField.getScene().getWindow();
         stage.close();
     }
