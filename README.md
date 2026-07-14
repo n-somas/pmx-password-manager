@@ -58,6 +58,7 @@ Das Projekt verbindet Java, JavaFX, lokale Datenhaltung, Verschlüsselung, Benut
 - Zwischenablage nach kurzer Zeit automatisch leeren
 - Verschlüsselter Backup Export
 - Verschlüsselter Backup Import
+- Automatische Tresor Sperre nach Inaktivität
 
 ## Sicherheitskonzept
 
@@ -69,6 +70,7 @@ Das Projekt verbindet Java, JavaFX, lokale Datenhaltung, Verschlüsselung, Benut
 - Kopierte Passwörter werden nach 20 Sekunden aus der Zwischenablage entfernt, sofern dort noch genau dieses Passwort enthalten ist
 - Passwort Alter Status unterstützt den Nutzer dabei, alte Zugangsdaten zu erkennen
 - Backup Dateien werden nicht als Klartext exportiert, sondern verschlüsselt gespeichert
+- Automatische Sperre schließt den Tresor nach Inaktivität und entfernt den aktiven Sitzungsschlüssel
 
 ## Technische Details
 
@@ -117,6 +119,24 @@ PMX-BACKUP-1
 ```
 
 Beim Import wird die Datei entschlüsselt, geprüft und anschließend werden neue Einträge ergänzt oder bestehende Einträge aktualisiert.
+
+## Architektur
+
+PMX ist bewusst in mehrere Verantwortungsbereiche aufgeteilt:
+
+```text
+JavaFX UI und FXML
+   ↓
+Controller
+   ↓
+Service Layer
+   ↓
+EncryptionUtil / BackupService / DatabaseHelper
+   ↓
+Lokale Datenbank und verschlüsselte Tresordaten
+```
+
+Die FXML Dateien beschreiben die Oberfläche. Die Controller reagieren auf Benutzeraktionen und steuern die Fenster, Dialoge und Tabellenlogik. Sicherheitsrelevante Funktionen wie Verschlüsselung und Backup Verarbeitung sind in eigene Hilfsklassen und Services ausgelagert. Dadurch bleibt die Oberfläche von der eigentlichen Fachlogik getrennt.
 
 ## Technologien
 

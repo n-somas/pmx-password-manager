@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.application.Platform;
 import app.AppState;
 import db.DatabaseHelper;
 import javafx.animation.PauseTransition;
@@ -28,6 +29,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
@@ -49,6 +51,7 @@ public class VaultController {
 
     private static final int PASSWORD_REVEAL_SECONDS = 10;
     private static final int CLIPBOARD_CLEAR_SECONDS = 20;
+    private static final int AUTO_LOCK_MINUTES = 5;
 
     private double windowDragOffsetX;
     private double windowDragOffsetY;
@@ -65,6 +68,8 @@ public class VaultController {
     private final ObservableList<VaultEntry> entries = FXCollections.observableArrayList();
     private final Map<String, String> revealedPasswords = new HashMap<>();
     private final Map<String, PauseTransition> revealTimers = new HashMap<>();
+    private PauseTransition autoLockTimer;
+    private boolean autoLockConfigured = false;
 
     @FXML
     public void initialize() {
@@ -87,6 +92,7 @@ public class VaultController {
         reloadFromDb();
         configureSearch();
         configureContextMenu();
+        Platform.runLater(this::configureAutoLock);
     }
 
     private void configureTableLayout() {
@@ -323,6 +329,53 @@ public class VaultController {
             entries.add(entry);
         }
     }
+    private void configureAutoLock() {
+        if (autoLockConfigured || vaultTable == null || vaultTable.getScene() == null) {
+            return;
+        }
+
+        autoLockConfigured = true;
+        autoLockTimer = new PauseTransition(Duration.minutes(AUTO_LOCK_MINUTES));
+        autoLockTimer.setOnFinished(event -> lockVaultAfterInactivity());
+
+        Scene scene = vaultTable.getScene();
+        scene.addEventFilter(MouseEvent.ANY, event -> resetAutoLockTimer());
+        scene.addEventFilter(KeyEvent.ANY, event -> resetAutoLockTimer());
+
+        resetAutoLockTimer();
+    }
+
+    private void resetAutoLockTimer() {
+        if (autoLockTimer != null) {
+            autoLockTimer.stop();
+            autoLockTimer.playFromStart();
+        }
+    }
+
+    private void stopAutoLockTimer() {
+        if (autoLockTimer != null) {
+            autoLockTimer.stop();
+        }
+    }
+
+    private void lockVaultAfterInactivity() {
+        try {
+            stopAutoLockTimer();
+            DatabaseHelper.closeDatabase();
+            AppState.getInstance().logout();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) vaultTable.getScene().getWindow();
+            stage.setScene(new Scene(root, 480, 560));
+            stage.setTitle("PMX Login");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            showModal("Fehler", "Automatische Sperre konnte Login nicht laden.");
+        }
+    }
+
 
     @FXML
     private void onAddEntry() {
@@ -619,6 +672,7 @@ public class VaultController {
 
     @FXML
     private void onLogout() {
+        stopAutoLockTimer();
         try {
             DatabaseHelper.closeDatabase();
             AppState.getInstance().logout();
@@ -737,6 +791,7 @@ public class VaultController {
 
     @FXML
     private void onCloseWindow() {
+        stopAutoLockTimer();
         try {
             DatabaseHelper.closeDatabase();
             AppState.getInstance().logout();
