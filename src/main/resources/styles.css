@@ -640,3 +640,18 @@
 .modern-table .table-row-cell {
     -fx-cell-size: 46;
 }
+/* PMX empty vault state */
+.empty-state-box {
+    -fx-padding: 28 18 28 18;
+}
+
+.empty-state-title {
+    -fx-font-size: 17px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #f8fafc;
+}
+
+.empty-state-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #94a3b8;
+}

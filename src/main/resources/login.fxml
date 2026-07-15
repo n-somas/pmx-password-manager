@@ -52,7 +52,7 @@
 
                 <Label fx:id="errorLabel" styleClass="error-label" wrapText="true" maxWidth="Infinity"/>
 
-                <Button fx:id="loginButton" text="Einloggen"
+                <Button fx:id="loginButton" text="Anmelden"
                         onAction="#onLogin"
                         defaultButton="true"
                         prefWidth="340"

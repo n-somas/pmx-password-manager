@@ -32,7 +32,7 @@
             <Button text="Backup exportieren" onAction="#onExportBackup" styleClass="secondary-button"/>
             <Button text="Backup importieren" onAction="#onImportBackup" styleClass="secondary-button"/>
             <Button text="+ Neuer Eintrag" onAction="#onAddEntry" styleClass="ghost-button"/>
-            <Button text="Ausloggen" onAction="#onLogout" styleClass="logout-button"/>
+            <Button text="Abmelden" onAction="#onLogout" styleClass="logout-button"/>
         </HBox>
 
         <VBox styleClass="panel-soft" spacing="14" VBox.vgrow="ALWAYS">
@@ -42,12 +42,12 @@
 
             <TableView fx:id="vaultTable" styleClass="modern-table" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="websiteColumn" text="Webseite"/>
+                    <TableColumn fx:id="websiteColumn" text="Website"/>
                     <TableColumn fx:id="usernameColumn" text="Benutzername"/>
                     <TableColumn fx:id="passwordColumn" text="Passwort"/>
                     <TableColumn fx:id="updatedAtColumn" text="Geändert"/>
                     <TableColumn fx:id="passwordAgeColumn" text="Status"/>
-                    <TableColumn fx:id="actionColumn" text="Aktion"/>
+                    <TableColumn fx:id="actionColumn" text="Aktionen"/>
                 </columns>
             </TableView>
         </VBox>

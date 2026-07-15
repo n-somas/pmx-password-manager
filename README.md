@@ -60,6 +60,7 @@ Das Projekt verbindet Java, JavaFX, lokale Datenhaltung, Verschlüsselung, Benut
 - Verschlüsselter Backup Import
 - Automatische Tresor Sperre nach Inaktivität
 - Login Sperre nach mehreren Fehlversuchen
+- Leerer Tresor Zustand mit Hinweis und Schnellzugriff auf neuen Eintrag
 
 ## Sicherheitskonzept
 

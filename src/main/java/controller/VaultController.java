@@ -74,6 +74,7 @@ public class VaultController {
     @FXML
     public void initialize() {
         configureTableLayout();
+        configureEmptyState();
 
         websiteColumn.setCellValueFactory(data -> new SimpleStringProperty(nullSafe(data.getValue().getWebsite())));
         usernameColumn.setCellValueFactory(data -> new SimpleStringProperty(nullSafe(data.getValue().getUsername())));
@@ -93,6 +94,27 @@ public class VaultController {
         configureSearch();
         configureContextMenu();
         Platform.runLater(this::configureAutoLock);
+    }
+
+
+    private void configureEmptyState() {
+        VBox emptyBox = new VBox(10);
+        emptyBox.setAlignment(Pos.CENTER);
+        emptyBox.getStyleClass().add("empty-state-box");
+
+        Label title = new Label("Noch keine Einträge vorhanden.");
+        title.getStyleClass().add("empty-state-title");
+
+        Label subtitle = new Label("Lege deinen ersten Eintrag an.");
+        subtitle.getStyleClass().add("empty-state-subtitle");
+
+        Button addButton = new Button("+ Neuer Eintrag");
+        addButton.getStyleClass().add("primary-button");
+        addButton.setFocusTraversable(false);
+        addButton.setOnAction(event -> onAddEntry());
+
+        emptyBox.getChildren().addAll(title, subtitle, addButton);
+        vaultTable.setPlaceholder(emptyBox);
     }
 
     private void configureTableLayout() {

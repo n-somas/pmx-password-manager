@@ -90,7 +90,7 @@ public class LoginController {
             stage.setTitle("PMX Tresor");
         } catch (Exception e) {
             e.printStackTrace();
-            errorLabel.setText("Unerwarteter Fehler beim Login.");
+            errorLabel.setText("Unerwarteter Fehler bei der Anmeldung.");
         }
     }
 
@@ -102,7 +102,7 @@ public class LoginController {
             return;
         }
 
-        errorLabel.setText("Login fehlgeschlagen. Versuch " + failedLoginAttempts + " von " + MAX_FAILED_ATTEMPTS + ".");
+        errorLabel.setText("Anmeldung fehlgeschlagen. Versuch " + failedLoginAttempts + " von " + MAX_FAILED_ATTEMPTS + ".");
     }
 
     private void startLoginLock() {
